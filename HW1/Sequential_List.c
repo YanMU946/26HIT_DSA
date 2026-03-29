@@ -1,24 +1,32 @@
 #include "Sequential_List.h"
 
-type init_buf[16] = {2, 2, 114, 514, 2026, 3, 2, 2, 19, 20, 46, 2, 2, 4, 55};
-type sorted_buf[22] = {0, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 5, 6, 7, 8, 8, 9, 9, 10, 11, 12, 12};
+type init_buf[16] = {2, 2, 114, 514, 2026, 3, 2, 2, 19, 20, 46, 2, 2, 4, 55};                 // 乱给的数
+type sorted_buf[22] = {0, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 5, 6, 7, 8, 8, 9, 9, 10, 11, 12, 12}; // 已排好序的线性表
 int main()
 {
+    /* --------------------------------- DEFINE --------------------------------- */
     SEQLIST mamba, outman;
 
-    SeqList_Init_Buffer(&mamba, init_buf, 16);
-    SeqList_Insert(&mamba, 79, 3);
+    // mamba表都是乱给的数，从init_buf给
+    SeqList_Init_Buffer(&mamba, init_buf, 16); // 数组初始化线性表
+    SeqList_Insert(&mamba, 79, 3);             // 插入一个数
     printf("Initialized list:\n");
-    SeqList_Printf(&mamba);
+    SeqList_Printf(&mamba); // 线性表打印
 
-    // SeqList_Erase(&mamba, 4);
-    SeqList_Erase_ALL(&mamba, 2);
-    SeqList_Erase_Pos(&mamba, 6);
-    SeqList_Inverse(&mamba);
+    // SeqList_Erase(&mamba, 4);     // 这个是删除值为x的，只删除1个
+    SeqList_Erase_ALL(&mamba, 2); // 删除所有值为x的
+    SeqList_Erase_Pos(&mamba, 6); // 删除位置x的数
+    SeqList_Inverse(&mamba);      // 线性表“逆置”
 
+    SeqList_PushK(&mamba, 3, LEFT); // 左移k位
+
+    // outman表是排好序的数，从sorted_buf给
     SeqList_Init_Buffer(&outman, sorted_buf, 22);
-    SeqList_Erase_Same(&outman);
+    SeqList_Erase_Same(&outman); // 删去所有相同元素
 
+    SeqList_PushK(&outman, 50, RIGHT); // 右移k位
+
+    /* ---------------------------------- FREE ---------------------------------- */
     SeqList_Destroy(&mamba);
     SeqList_Destroy(&outman);
     return 0;
@@ -190,13 +198,48 @@ void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir)
     {
     case RIGHT:
     {
+        type *buf_l = malloc((obj->size - k) * sizeof(type));
+        type *buf_r = malloc(k * sizeof(type));
+        if (buf_l == NULL || buf_r == NULL)
+        {
+            printf("malloc failed!\n");
+            assert(buf_l);
+            assert(buf_r);
+        }
+        memcpy(buf_l, obj->arr, (obj->size - k) * sizeof(type));
+        memcpy(buf_r, obj->arr + obj->size - k, k * sizeof(type));
+
+        memcpy(obj->arr, buf_r, k * sizeof(type));
+        memcpy(obj->arr + k, buf_l, (obj->size - k) * sizeof(type));
+        printf("Push right %d num:\n", k);
+        SeqList_Printf(obj);
+        free(buf_l);
+        free(buf_r);
     }
     break;
     case LEFT:
     {
+        type *buf_l = malloc(k * sizeof(type));
+        type *buf_r = malloc((obj->size - k) * sizeof(type));
+        if (buf_l == NULL || buf_r == NULL)
+        {
+            printf("malloc failed!\n");
+            assert(buf_l);
+            assert(buf_r);
+        }
+        memcpy(buf_l, obj->arr, k * sizeof(type));
+        memcpy(buf_r, obj->arr + k, (obj->size - k) * sizeof(type));
+
+        memcpy(obj->arr, buf_r, (obj->size - k) * sizeof(type));
+        memcpy(obj->arr + obj->size - k, buf_l, k * sizeof(type));
+        printf("Push left %d num:\n", k);
+        SeqList_Printf(obj);
+        free(buf_l);
+        free(buf_r);
     }
     break;
     default:
+        printf("Delay no more! Choose wrong direction!\n");
         break;
     }
 }

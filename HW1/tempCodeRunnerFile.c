@@ -1,1 +1,0 @@
-void SeqList_Erase_Same(SEQLIST *obj)

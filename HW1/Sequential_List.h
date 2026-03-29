@@ -37,4 +37,5 @@ void SeqList_Erase_Same(SEQLIST *obj);
 
 void SeqList_Inverse(SEQLIST *obj);
 
+void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir);
 #endif /* end Sequential_List */
