@@ -14,10 +14,11 @@ typedef struct
     int size;
 } SEQLIST;
 
-typedef enum{
+typedef enum
+{
     RIGHT,
     LEFT
-}DIRECTION;
+} DIRECTION;
 
 void SeqList_Init(SEQLIST *obj);
 void SeqList_Init_Buffer(SEQLIST *obj, type *buf, int buf_size);
@@ -34,8 +35,7 @@ void SeqList_Erase(SEQLIST *obj, type val);
 void SeqList_Erase_ALL(SEQLIST *obj, type val);
 void SeqList_Erase_Pos(SEQLIST *obj, int pos);
 void SeqList_Erase_Same(SEQLIST *obj);
-
 void SeqList_Inverse(SEQLIST *obj);
-
 void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir);
+void SeqList_Merge(SEQLIST *obj1, SEQLIST *obj2);
 #endif /* end Sequential_List */

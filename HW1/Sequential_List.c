@@ -2,15 +2,16 @@
 
 type init_buf[16] = {2, 2, 114, 514, 2026, 3, 2, 2, 19, 20, 46, 2, 2, 4, 55};                 // 乱给的数
 type sorted_buf[22] = {0, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 5, 6, 7, 8, 8, 9, 9, 10, 11, 12, 12}; // 已排好序的线性表
+type sorted_buff[12] = {3, 3, 4, 5, 7, 8, 8, 9, 10, 10, 10, 12};                              // 已排好序的线性表
 int main()
 {
     /* --------------------------------- DEFINE --------------------------------- */
-    SEQLIST mamba, outman;
+    SEQLIST mamba, outman, outoutman;
 
     // mamba表都是乱给的数，从init_buf给
     SeqList_Init_Buffer(&mamba, init_buf, 16); // 数组初始化线性表
     SeqList_Insert(&mamba, 79, 3);             // 插入一个数
-    printf("Initialized list:\n");
+    printf("mamba list:\n");
     SeqList_Printf(&mamba); // 线性表打印
 
     // SeqList_Erase(&mamba, 4);     // 这个是删除值为x的，只删除1个
@@ -18,17 +19,27 @@ int main()
     SeqList_Erase_Pos(&mamba, 6); // 删除位置x的数
     SeqList_Inverse(&mamba);      // 线性表“逆置”
 
-    SeqList_PushK(&mamba, 3, LEFT); // 左移k位
+    SeqList_PushK(&mamba, 3, LEFT);   // 左移k位
+    SeqList_PushK(&mamba, 50, RIGHT); // 右移k位
 
+    printf("********************************************\n");
     // outman表是排好序的数，从sorted_buf给
     SeqList_Init_Buffer(&outman, sorted_buf, 22);
+    printf("outman list:\n");
+    SeqList_Printf(&outman); // 线性表打印
+
     SeqList_Erase_Same(&outman); // 删去所有相同元素
 
-    SeqList_PushK(&outman, 50, RIGHT); // 右移k位
+    // outoutman表是排好序的数，从sorted_buff给
+    SeqList_Init_Buffer(&outoutman, sorted_buff, 12);
+    printf("outoutman list:\n");
+    SeqList_Printf(&outoutman); // 线性表打印
 
+    SeqList_Merge(&outman, &outoutman);
     /* ---------------------------------- FREE ---------------------------------- */
     SeqList_Destroy(&mamba);
     SeqList_Destroy(&outman);
+    SeqList_Destroy(&outoutman);
     return 0;
 }
 
@@ -144,7 +155,7 @@ void SeqList_Erase_ALL(SEQLIST *obj, type val)
     }
     while (SeqList_FindFirst(obj, val) != -1)
         SeqList_Erase(obj, val);
-    printf("Delete all members val: %d\n", val);
+    printf("##1.Delete all members val: %d\n", val);
     SeqList_Printf(obj);
 }
 
@@ -173,23 +184,25 @@ void SeqList_Erase_Same(SEQLIST *obj)
         while (obj->arr[i] == obj->arr[i + 1])
             SeqList_Erase(obj, obj->arr[i]);
     }
-    printf("Delete same elememts:\n");
+    printf("##2.Delete same elememts:\n");
     SeqList_Printf(obj);
 }
 
 void SeqList_Inverse(SEQLIST *obj)
 {
-    type temp_buf[obj->size];
-    for (int i = 0; i < obj->size; i++)
-        temp_buf[i] = obj->arr[obj->size - i - 1];
-    memcpy(obj->arr, temp_buf, obj->size * sizeof(type));
-    printf("Inverse list:\n");
+    for (int i = 0; i < obj->size / 2; i++)
+    {
+        type temp = obj->arr[i];
+        obj->arr[i] = obj->arr[obj->size - i - 1];
+        obj->arr[obj->size - i - 1] = temp;
+    }
+    printf("##3.Inverse list:\n");
     SeqList_Printf(obj);
 }
 
 void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir)
 {
-    if (k % obj->size > 0)
+    if (k / obj->size > 0)
     {
         int temp = k / obj->size;
         k -= temp * obj->size;
@@ -198,8 +211,8 @@ void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir)
     {
     case RIGHT:
     {
-        type *buf_l = malloc((obj->size - k) * sizeof(type));
-        type *buf_r = malloc(k * sizeof(type));
+        type *buf_l = (type *)malloc((obj->size - k) * sizeof(type));
+        type *buf_r = (type *)malloc(k * sizeof(type));
         if (buf_l == NULL || buf_r == NULL)
         {
             printf("malloc failed!\n");
@@ -211,7 +224,7 @@ void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir)
 
         memcpy(obj->arr, buf_r, k * sizeof(type));
         memcpy(obj->arr + k, buf_l, (obj->size - k) * sizeof(type));
-        printf("Push right %d num:\n", k);
+        printf("##4.Push right %d num:\n", k);
         SeqList_Printf(obj);
         free(buf_l);
         free(buf_r);
@@ -219,8 +232,8 @@ void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir)
     break;
     case LEFT:
     {
-        type *buf_l = malloc(k * sizeof(type));
-        type *buf_r = malloc((obj->size - k) * sizeof(type));
+        type *buf_l = (type *)malloc(k * sizeof(type));
+        type *buf_r = (type *)malloc((obj->size - k) * sizeof(type));
         if (buf_l == NULL || buf_r == NULL)
         {
             printf("malloc failed!\n");
@@ -232,7 +245,7 @@ void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir)
 
         memcpy(obj->arr, buf_r, (obj->size - k) * sizeof(type));
         memcpy(obj->arr + obj->size - k, buf_l, k * sizeof(type));
-        printf("Push left %d num:\n", k);
+        printf("##4.Push left %d num:\n", k);
         SeqList_Printf(obj);
         free(buf_l);
         free(buf_r);
@@ -242,4 +255,43 @@ void SeqList_PushK(SEQLIST *obj, int k, DIRECTION dir)
         printf("Delay no more! Choose wrong direction!\n");
         break;
     }
+}
+
+void SeqList_Merge(SEQLIST *obj1, SEQLIST *obj2)
+{
+    SEQLIST new_obj;
+    SeqList_Init(&new_obj);
+    int i = 0, j = 0;
+    while (i < obj1->size && j < obj2->size)
+    {
+        if (obj1->arr[i] <= obj2->arr[j])
+        {
+            SeqList_CheckCap(&new_obj);
+            new_obj.arr[new_obj.size++] = obj1->arr[i++];
+        }
+        else
+        {
+            SeqList_CheckCap(&new_obj);
+            new_obj.arr[new_obj.size++] = obj2->arr[j++];
+        }
+    }
+    if (i >= obj1->size)
+    {
+        while (j < obj2->size)
+        {
+            SeqList_CheckCap(&new_obj);
+            new_obj.arr[new_obj.size++] = obj2->arr[j++];
+        }
+    }
+    else
+    {
+        while (i < obj1->size)
+        {
+            SeqList_CheckCap(&new_obj);
+            new_obj.arr[new_obj.size++] = obj2->arr[i++];
+        }
+    }
+    printf("##5.Merge 2 list:\n");
+    SeqList_Printf(&new_obj);
+    SeqList_Destroy(&new_obj);
 }
