@@ -14,13 +14,13 @@ struct Point
     bool operator==(Point _point) { return (x == _point.x && y == _point.y); }
 };
 
-template<int _col, int _row>
+template<int _row, int _col>
 class Maze
 {
 public:
     Maze() {}
 
-    Maze<_col, _row>(const std::vector<std::vector<int>>& _maze, const Point& _start = Point(0, 0), const Point& _end = Point(_row - 1, _col - 1))
+    Maze<_row, _col>(const std::vector<std::vector<int>>& _maze, const Point& _start = Point(0, 0), const Point& _end = Point(_row - 1, _col - 1))
         :start(_start), end(_end), row(_row), col(_col)
     {
         maze = _maze;
