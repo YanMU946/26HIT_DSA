@@ -27,6 +27,8 @@ public:
         maze[start.x][start.y] = maze[end.x][end.y] = 0;
     }
 
+    Point& get_start() { return start; }
+
     void print()
     {
         for (int i = 0;i < col + 2;i++)
@@ -46,11 +48,13 @@ public:
                 if (Point(i, j) == start)
                 {
                     std::cout << "S ";
+                    maze[i][j] = 0;
                     continue;
                 }
                 else if (Point(i, j) == end)
                 {
                     std::cout << "E ";
+                    maze[i][j] = 0;
                     continue;
                 }
                 else if (maze[i][j] == 0)
@@ -136,52 +140,28 @@ public:
         return false;
     }
 
-    bool SolvePuzzle_Recursive()
+    bool SolvePuzzle_Recursive(Point& cur)
     {
-        std::stack<Point> maze_point;
-        maze_point.push(start);
-
-        std::vector<std::vector<bool>> IsVisited(row, std::vector<bool>(col, false));
-        IsVisited[start.x][start.y] = true;
+        if (cur == end)
+        {
+            maze[cur.x][cur.y] = -1;
+            return true;
+        }
 
         int move_x[] = { -1, 0, 1,-1, 1,-1, 0, 1 };
         int move_y[] = { -1,-1,-1, 0, 0, 1, 1, 1 };
 
-        while (!maze_point.empty())
+        maze[cur.x][cur.y] = -1;
+
+        for (int i = 0;i < 8;i++)
         {
-            Point cur = maze_point.top();
-
-            if (cur == end)
-            {
-                while (!maze_point.empty())
-                {
-                    cur = maze_point.top();
-                    maze[cur.x][cur.y] = -1;
-                    maze_point.pop();
-                }
-                return true;
-            }
-
-            bool IsSuccess = false;
-
-            for (int i = 0;i < 8;i++)
-            {
-                Point n_cur(cur.x + move_x[i], cur.y + move_y[i]);
-                if (IsValid(n_cur) && !IsVisited[n_cur.x][n_cur.y])
-                {
-                    maze_point.push(n_cur);
-                    IsVisited[n_cur.x][n_cur.y] = true;
-                    IsSuccess = true;
-                    break;
-                }
-            }
-
-            if (!IsSuccess)
-            {
-                maze_point.pop();
-            }
+            Point n_cur(cur.x + move_x[i], cur.y + move_y[i]);
+            if (IsValid(n_cur))
+                if (SolvePuzzle_Recursive(n_cur))
+                    return true;
         }
 
+        maze[cur.x][cur.y] = 0;
         return false;
     }
 
