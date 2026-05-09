@@ -87,7 +87,7 @@ public:
 		for (int i = 0;i < size;i++)
 			cout << elem[i].data << "	" << elem[i].weight << "	" << elem[i].parent << "	" << elem[i].left << "	" << elem[i].right << endl;
 		string temp;
-		stack<string> st;		//利用栈实现上一个char类型strcpy的方法
+		stack<string> st;		
 		int cur = 0, pre_cur = 0;
 		for (int i = 0; i < num; i++) {
 			cur = i;
@@ -104,7 +104,7 @@ public:
 				st.pop();
 			}
 			ascii_hfbuf[elem[i].data] = elem[i].hf_code = temp;
-			temp.erase();	//擦除内存
+			temp.erase();	
 		}
 		cout << "**Huffman Code**:" << endl;
 		cout << "data	code" << endl;
